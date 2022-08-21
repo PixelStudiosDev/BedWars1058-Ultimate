@@ -1,0 +1,8 @@
+name: BedWars1058-Ultimate
+version: '${project.version}'
+main: me.cubecrafter.ultimate.UltimatePlugin
+author: CubeCrafter
+api-version: 1.13
+description: A fun game mode for BedWars1058!
+depend:
+  - BedWars1058
