@@ -28,8 +28,6 @@ public final class UltimatePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        getLogger().warning("Keep in mind that this plugin is a beta version, so there may be bugs.");
-        getLogger().warning("Enter in my discord server to report bugs: https://discord.gg/WzQhrNJkYu");
         bedWars = getServer().getServicesManager().getRegistration(BedWars.class).getProvider();
         fileManager = new FileManager(this);
         ultimateManager = new UltimateManager();

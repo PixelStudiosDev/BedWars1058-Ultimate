@@ -3,12 +3,10 @@ package me.cubecrafter.ultimate.listeners;
 import com.andrei1058.bedwars.api.arena.GameState;
 import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
-import com.andrei1058.bedwars.arena.Misc;
 import com.cryptomorin.xseries.ReflectionUtils;
 import com.cryptomorin.xseries.XSound;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
-import me.cubecrafter.ultimate.utils.ItemBuilder;
 import me.cubecrafter.ultimate.utils.TextUtil;
 import me.cubecrafter.ultimate.utils.Utils;
 import org.bukkit.Bukkit;
@@ -55,7 +53,7 @@ public class BuilderListener implements Listener, Runnable {
                 if (e.getClickedBlock().getType().equals(Material.BED_BLOCK)) {
                     protectBed(player, arena, e.getClickedBlock());
                 } else {
-                    if (Misc.isBuildProtected(e.getClickedBlock().getRelative(e.getBlockFace()).getLocation(), arena)) {
+                    if (arena.isProtected(e.getClickedBlock().getRelative(e.getBlockFace()).getLocation())) {
                         TextUtil.sendMessage(player, "&cYou can't place blocks here!");
                         return;
                     }
@@ -70,7 +68,7 @@ public class BuilderListener implements Listener, Runnable {
                 if (e.getClickedBlock().getType().equals(Material.BED_BLOCK)) {
                     protectBed(player, arena, e.getClickedBlock());
                 } else {
-                    if (Misc.isBuildProtected(e.getClickedBlock().getRelative(e.getBlockFace()).getLocation(), arena)) {
+                    if (arena.isProtected(e.getClickedBlock().getRelative(e.getBlockFace()).getLocation())) {
                         TextUtil.sendMessage(player, "&cYou can't place blocks here!");
                         return;
                     }
@@ -107,7 +105,7 @@ public class BuilderListener implements Listener, Runnable {
                 } else {
                     block = block.getRelative(clickedFace);
                 }
-                if (Misc.isBuildProtected(block.getLocation(), arena)) {
+                if (arena.isProtected(block.getLocation())) {
                     TextUtil.sendMessage(player, "&cYou can't build a bridge here!");
                     cancel();
                     return;
@@ -178,7 +176,7 @@ public class BuilderListener implements Listener, Runnable {
             @Override
             public void run() {
                 for (Block block : row) {
-                    if (Misc.isBuildProtected(block.getLocation(), arena)) {
+                    if (arena.isProtected(block.getLocation())) {
                         TextUtil.sendMessage(player, "&cYou can't build a wall here!");
                         cancel();
                         return;
