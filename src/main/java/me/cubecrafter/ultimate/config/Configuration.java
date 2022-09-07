@@ -19,6 +19,7 @@ public enum Configuration {
     KANGAROO_DISPLAYNAME("ultimates.kangaroo.displayname"),
     SWORDSMAN_ENABLED("ultimates.swordsman.enabled"),
     SWORDSMAN_DISPLAYNAME("ultimates.swordsman.displayname"),
+    SWORDSMAN_LOADING_SOUND("ultimates.swordsman.loading-sound"),
     HEALER_ENABLED("ultimates.healer.enabled"),
     HEALER_DISPLAYNAME("ultimates.healer.displayname"),
     HEALER_ITEM_NAME("ultimates.healer.ultimate-item-name"),

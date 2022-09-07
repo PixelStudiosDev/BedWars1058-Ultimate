@@ -23,6 +23,7 @@ ultimates:
   swordsman:
     enabled: true
     displayname: "Swordsman"
+    loading-sound: BLOCK_NOTE_PLING
   healer:
     enabled: true
     displayname: "Healer"

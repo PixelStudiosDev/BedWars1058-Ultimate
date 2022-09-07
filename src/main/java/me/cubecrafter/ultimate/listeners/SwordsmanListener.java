@@ -5,6 +5,7 @@ import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
 import com.cryptomorin.xseries.XSound;
 import me.cubecrafter.ultimate.UltimatePlugin;
+import me.cubecrafter.ultimate.config.Configuration;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
 import me.cubecrafter.ultimate.utils.Cooldown;
 import me.cubecrafter.ultimate.utils.Utils;
@@ -45,9 +46,7 @@ public class SwordsmanListener implements Listener, Runnable {
         if (e.getKiller() == null) return;
         Player player = e.getKiller();
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.SWORDSMAN) return;
-        cooldowns.remove(player);
-        player.setExp(0);
-        player.setLevel(0);
+        resetCooldown(player);
         player.setHealth(player.getHealth() + 2);
     }
 
@@ -62,6 +61,9 @@ public class SwordsmanListener implements Listener, Runnable {
                     if (player.isBlocking() && (!blocking.containsKey(player) || blocking.get(player) < 40)) {
                         blocking.merge(player, 1, Integer::sum);
                         player.setExp(blocking.get(player) / 40f);
+                        if (blocking.get(player) % 5 == 0) {
+                            XSound.play(player, Configuration.SWORDSMAN_LOADING_SOUND.getAsString());
+                        }
                     } else if (!player.isBlocking() && blocking.containsKey(player)) {
                         recall.put(player, player.getLocation());
                         player.setVelocity(player.getLocation().getDirection().multiply(blocking.get(player) * 0.08).setY(blocking.get(player) * 0.03));
