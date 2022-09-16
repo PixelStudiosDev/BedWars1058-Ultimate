@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.config.Configuration;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -34,6 +35,7 @@ public class Utils {
 
     public void removeActiveCooldowns(Player player) {
         UltimatePlugin plugin = UltimatePlugin.getInstance();
+        plugin.getDemolitionListener().resetCooldown(player);
         plugin.getKangarooListener().resetCooldown(player);
         plugin.getSwordsmanListener().resetCooldown(player);
         plugin.getHealerListener().resetCooldown(player);
@@ -61,7 +63,7 @@ public class Utils {
         Utils.clearUltimateItems(player);
         switch (ultimate) {
             case KANGAROO:
-                player.setAllowFlight(true);
+                Bukkit.getScheduler().runTaskLater(UltimatePlugin.getInstance(), () -> player.setAllowFlight(true), 1L);
                 break;
             case HEALER:
                 player.getInventory().addItem(getHealerPotion());

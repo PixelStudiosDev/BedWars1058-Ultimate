@@ -5,6 +5,7 @@ import com.andrei1058.bedwars.api.events.player.PlayerBedBreakEvent;
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
+import me.cubecrafter.ultimate.utils.Cooldown;
 import me.cubecrafter.ultimate.utils.ItemBuilder;
 import me.cubecrafter.ultimate.utils.Utils;
 import org.bukkit.Bukkit;
@@ -24,20 +25,33 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.SpawnEgg;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
-public class DemolitionListener implements Listener {
+public class DemolitionListener implements Listener, Runnable {
 
     private final UltimatePlugin plugin;
     private final Map<Player, Integer> killCount = new HashMap<>();
+    private final Map<Player, Cooldown> cooldowns = new HashMap<>();
 
     public DemolitionListener(UltimatePlugin plugin) {
         this.plugin = plugin;
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        Bukkit.getScheduler().runTaskTimer(plugin, this, 0, 1L);
+    }
+
+    @Override
+    public void run() {
+        for (Map.Entry<Player, Cooldown> entry : cooldowns.entrySet()) {
+            Cooldown cooldown = entry.getValue();
+            Player player = entry.getKey();
+            if (cooldown.isExpired()) {
+                resetCooldown(player);
+                player.setAllowFlight(true);
+                continue;
+            }
+            player.setExp(cooldown.getPercentageLeft());
+            player.setLevel(cooldown.getSecondsLeft());
+        }
     }
 
     @EventHandler
@@ -47,11 +61,11 @@ public class DemolitionListener implements Listener {
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
         if (!Utils.isUltimateArena(arena)) return;
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.DEMOLITION) return;
+        e.setCancelled(true);
+        if (cooldowns.containsKey(player)) return;
+        cooldowns.put(player, new Cooldown(10));
         Block ignited = e.getBlock().getRelative(BlockFace.DOWN);
-        if (ignited.getType() != Material.WOOL || !arena.isBlockPlaced(ignited)) {
-            e.setCancelled(true);
-            return;
-        }
+        if (!ignited.getType().toString().endsWith("WOOL") || !arena.isBlockPlaced(ignited)) return;
         handleDemolition(player, arena, ignited);
     }
 
@@ -147,6 +161,12 @@ public class DemolitionListener implements Listener {
             }
         }
         return wool;
+    }
+
+    public void resetCooldown(Player player) {
+        cooldowns.remove(player);
+        player.setExp(0);
+        player.setLevel(0);
     }
 
 }
