@@ -95,27 +95,32 @@
         </dependency>
         <dependency>
             <groupId>com.andrei1058.bedwars</groupId>
-            <artifactId>bedwars</artifactId>
-            <version>22.7</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/bedwars-plugin-22.7.jar</systemPath>
+            <artifactId>bedwars-api</artifactId>
+            <version>23.3-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.andrei1058.bedwars</groupId>
+            <artifactId>bedwars-plugin</artifactId>
+            <version>23.3-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>XSeries</artifactId>
-            <version>9.0.0</version>
+            <version>9.3.1</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
