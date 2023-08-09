@@ -33,6 +33,10 @@ public class Utils {
         return !getTag(item, "ultimate").equals("");
     }
 
+    public boolean isBed(Material material){
+        return UltimatePlugin.getInstance().getBedWars().getVersionSupport().isBed(material);
+    }
+
     public void removeActiveCooldowns(Player player) {
         UltimatePlugin plugin = UltimatePlugin.getInstance();
         plugin.getDemolitionListener().resetCooldown(player);

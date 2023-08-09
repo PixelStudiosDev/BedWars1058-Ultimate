@@ -6,12 +6,15 @@ import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
 import com.cryptomorin.xseries.XMaterial;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
+import me.cubecrafter.ultimate.utils.ItemBuilder;
 import me.cubecrafter.ultimate.utils.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -56,10 +59,15 @@ public class FrozoListener implements Listener {
         Player player = e.getKiller();
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.FROZO) return;
         ItemStack snowball = XMaterial.SNOWBALL.parseItem();
+        snowball = new ItemBuilder(snowball).setTag("ultimate", "snowball").build();
         for (int i = 0; i < 2; i++) {
             if (Utils.getAmount(snowball, player.getInventory()) >= 16) break;
             player.getInventory().addItem(snowball);
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInteract(PlayerInteractEvent event){
+        if(Utils.isUltimateItem(event.getItem())) event.setCancelled(true);
+    }
 }

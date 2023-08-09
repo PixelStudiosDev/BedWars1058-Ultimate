@@ -46,7 +46,7 @@ public class DemolitionListener implements Listener, Runnable {
             Player player = entry.getKey();
             if (cooldown.isExpired()) {
                 resetCooldown(player);
-                player.setAllowFlight(true);
+                player.setAllowFlight(false);
                 continue;
             }
             player.setExp(cooldown.getPercentageLeft());
@@ -70,8 +70,8 @@ public class DemolitionListener implements Listener, Runnable {
     }
 
     @EventHandler
-    public void onKill(PlayerKillEvent e) {
-        Player player = e.getVictim();
+    public void onKill(PlayerKillEvent event) {
+        Player player = event.getVictim();
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
         if (!Utils.isUltimateArena(arena)) return;
         if (plugin.getUltimateManager().getUltimate(player) == Ultimate.DEMOLITION) {
@@ -79,7 +79,7 @@ public class DemolitionListener implements Listener, Runnable {
             tnt.setIsIncendiary(false);
             tnt.setMetadata("ultimate", new FixedMetadataValue(plugin, arena.getTeam(player).getName()));
         }
-        Player killer = e.getKiller();
+        Player killer = event.getKiller();
         if (killer == null) return;
         if (plugin.getUltimateManager().getUltimate(killer) == Ultimate.DEMOLITION) {
             killCount.merge(killer, 1, Integer::sum);
@@ -126,7 +126,7 @@ public class DemolitionListener implements Listener, Runnable {
         SpawnEgg egg = (SpawnEgg) e.getItem().getData();
         if (egg.getSpawnedType() != EntityType.CREEPER) return;
         e.setCancelled(true);
-        e.getClickedBlock().getWorld().spawnEntity(e.getClickedBlock().getLocation().add(0,1,0), EntityType.CREEPER);
+        e.getClickedBlock().getWorld().spawnEntity(e.getClickedBlock().getLocation().add(0, 1, 0), EntityType.CREEPER);
         player.getInventory().remove(e.getItem());
     }
 

@@ -6,6 +6,7 @@ import com.andrei1058.bedwars.api.arena.team.ITeam;
 import com.cryptomorin.xseries.ReflectionUtils;
 import com.cryptomorin.xseries.XSound;
 import me.cubecrafter.ultimate.UltimatePlugin;
+import me.cubecrafter.ultimate.config.Configuration;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
 import me.cubecrafter.ultimate.utils.TextUtil;
 import me.cubecrafter.ultimate.utils.Utils;
@@ -50,11 +51,11 @@ public class BuilderListener implements Listener, Runnable {
             if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 player.getInventory().setItem(player.getInventory().getHeldItemSlot(), Utils.getBridgeItem());
             } else if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                if (e.getClickedBlock().getType().equals(Material.BED_BLOCK)) {
+                if (Utils.isBed(e.getClickedBlock().getType())) {
                     protectBed(player, arena, e.getClickedBlock());
                 } else {
                     if (arena.isProtected(e.getClickedBlock().getRelative(e.getBlockFace()).getLocation())) {
-                        TextUtil.sendMessage(player, "&cYou can't place blocks here!");
+                        TextUtil.sendMessage(player, Configuration.CANT_PLACE.getAsString());
                         return;
                     }
                     buildWall(player, e.getClickedBlock(), arena, e.getBlockFace());
@@ -65,11 +66,11 @@ public class BuilderListener implements Listener, Runnable {
             if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 player.getInventory().setItem(player.getInventory().getHeldItemSlot(), Utils.getWallItem());
             } else if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                if (e.getClickedBlock().getType().equals(Material.BED_BLOCK)) {
+                if (Utils.isBed(e.getClickedBlock().getType())) {
                     protectBed(player, arena, e.getClickedBlock());
                 } else {
                     if (arena.isProtected(e.getClickedBlock().getRelative(e.getBlockFace()).getLocation())) {
-                        TextUtil.sendMessage(player, "&cYou can't place blocks here!");
+                        TextUtil.sendMessage(player, Configuration.CANT_PLACE.getAsString());
                         return;
                     }
                     buildBridge(player, e.getClickedBlock(), arena, e.getBlockFace());
@@ -106,7 +107,7 @@ public class BuilderListener implements Listener, Runnable {
                     block = block.getRelative(clickedFace);
                 }
                 if (arena.isProtected(block.getLocation())) {
-                    TextUtil.sendMessage(player, "&cYou can't build a bridge here!");
+                    TextUtil.sendMessage(player, Configuration.CANT_BUILD_BRIDGE.getAsString());
                     cancel();
                     return;
                 }
@@ -126,7 +127,7 @@ public class BuilderListener implements Listener, Runnable {
                         player.getInventory().setItem(wool, null);
                     }
                 } else {
-                    TextUtil.sendMessage(player, "&cYou have ran out of wool blocks!");
+                    TextUtil.sendMessage(player, Configuration.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
                     cancel();
                     return;
                 }
@@ -177,7 +178,7 @@ public class BuilderListener implements Listener, Runnable {
             public void run() {
                 for (Block block : row) {
                     if (arena.isProtected(block.getLocation())) {
-                        TextUtil.sendMessage(player, "&cYou can't build a wall here!");
+                        TextUtil.sendMessage(player, Configuration.CANT_WALL_BRIDGE.getAsString());
                         cancel();
                         return;
                     }
@@ -192,7 +193,7 @@ public class BuilderListener implements Listener, Runnable {
                             player.getInventory().setItem(wool, null);
                         }
                     } else {
-                        TextUtil.sendMessage(player, "&cYou have ran out of wool blocks!");
+                        TextUtil.sendMessage(player, Configuration.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
                         cancel();
                         continue;
                     }
@@ -219,12 +220,12 @@ public class BuilderListener implements Listener, Runnable {
     private void protectBed(Player player, IArena arena, Block block) {
         ITeam team = arena.getTeam(player);
         if (team.getBed().distanceSquared(block.getLocation()) > 1) {
-            TextUtil.sendMessage(player, "&cYou can only protect your team bed!");
+            TextUtil.sendMessage(player, Configuration.CANT_PROTECT_BED.getAsString());
             return;
         }
         int slot = player.getInventory().first(Material.WOOL);
         if (slot == -1) {
-            TextUtil.sendMessage(player, "&cYou have ran out of wool blocks!");
+            TextUtil.sendMessage(player, Configuration.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
             return;
         }
         Bed bed = new Bed(block.getType(), block.getData());
@@ -249,7 +250,7 @@ public class BuilderListener implements Listener, Runnable {
                         player.getInventory().clear(wool);
                     }
                 } else {
-                    TextUtil.sendMessage(player, "&cYou have ran out of wool blocks!");
+                    TextUtil.sendMessage(player, Configuration.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
                     return;
                 }
                 if (ReflectionUtils.supports(13)) {

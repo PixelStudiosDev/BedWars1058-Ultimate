@@ -6,7 +6,7 @@
 
     <groupId>me.cubecrafter</groupId>
     <artifactId>BedWars1058-Ultimate</artifactId>
-    <version>1.0.3</version>
+    <version>1.1.0-BETA</version>
     <packaging>jar</packaging>
 
     <name>BedWars1058-Ultimate</name>
@@ -96,14 +96,14 @@
         <dependency>
             <groupId>com.andrei1058.bedwars</groupId>
             <artifactId>bedwars</artifactId>
-            <version>22.7</version>
+            <version>23.3</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/libs/bedwars-plugin-22.7.jar</systemPath>
+            <systemPath>${project.basedir}/libs/bedwars-plugin-23.3.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -115,7 +115,7 @@
         <dependency>
             <groupId>com.github.cryptomorin</groupId>
             <artifactId>XSeries</artifactId>
-            <version>9.0.0</version>
+            <version>9.4.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
