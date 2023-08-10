@@ -59,7 +59,7 @@ public enum Config {
     CANT_PLACE("messages.cant-place-blocks"),
     CANT_BUILD_BRIDGE("messages.cant-build-bridge"),
     CANT_WALL_BRIDGE("messages.cant-build-wall"),
-    CANT_PROTECT_BED("messages.You can only protect your team bed"),
+    CANT_PROTECT_BED("messages.cant-protect-bed"),
     RAN_OUT_OF_WOOL_BLOCKS("messages.ran-out-of-wool-blocks"),
     MESSAGE_ULTIMATE_ALREADY_SELECTED("messages.ultimate-already-selected"),
     MESSAGE_ULTIMATE_SELECTED("messages.ultimate-selected"),

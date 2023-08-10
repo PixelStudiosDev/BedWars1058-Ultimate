@@ -154,7 +154,7 @@ messages:
   cant-place-blocks: "&cYou can't place blocks here!"
   cant-build-bridge: "&cYou can't build a bridge here!"
   cant-build-wall: "&cYou can't build a wall here!"
-  cant-protect-bed: "&cYou can only protect your team bed!"
+  cant-protect-bed: "&cYou can only protect your team's bed!"
   ran-out-of-wool-blocks: "&cYou have ran out of wool blocks!"
   ultimate-already-selected: "&cYou already have this ultimate selected!"
   ultimate-selected: "&aSwitched ultimate to &6{ultimate}&a!"

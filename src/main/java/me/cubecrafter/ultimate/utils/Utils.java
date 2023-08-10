@@ -11,6 +11,7 @@ import me.cubecrafter.xutils.item.ItemUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -19,6 +20,12 @@ import org.bukkit.potion.PotionEffectType;
 
 @UtilityClass
 public class Utils {
+
+    private static final BlockFace[] AXIS = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
+
+    public BlockFace yawToFace(float yaw) {
+        return AXIS[Math.round(yaw / 90f) & 0x3].getOppositeFace();
+    }
 
     public boolean isUltimateArena(IArena arena) {
         return arena != null && UltimatePlugin.getInstance().getUltimateManager().isUltimateArena(arena);
@@ -168,7 +175,7 @@ public class Utils {
         return new ItemBuilder(material).build();
     }
 
-    public Material getMaterial(TeamColor color) {
+    public Material getWoolMaterial(TeamColor color) {
         if (color == TeamColor.AQUA) {
             return Material.valueOf("CYAN_WOOL");
         }

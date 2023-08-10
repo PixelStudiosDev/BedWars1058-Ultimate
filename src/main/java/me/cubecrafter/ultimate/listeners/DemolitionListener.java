@@ -9,7 +9,6 @@ import me.cubecrafter.ultimate.utils.Cooldown;
 import me.cubecrafter.ultimate.utils.Utils;
 import me.cubecrafter.xutils.Tasks;
 import me.cubecrafter.xutils.item.ItemBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -26,7 +25,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.SpawnEgg;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DemolitionListener implements Listener, Runnable {
 
@@ -47,28 +50,36 @@ public class DemolitionListener implements Listener, Runnable {
         for (Map.Entry<Player, Cooldown> entry : cooldowns.entrySet()) {
             Cooldown cooldown = entry.getValue();
             Player player = entry.getKey();
+
             if (cooldown.isExpired()) {
                 resetCooldown(player);
-                player.setAllowFlight(false);
                 continue;
             }
+
             player.setExp(cooldown.getPercentageLeft());
             player.setLevel(cooldown.getSecondsLeft());
         }
     }
 
     @EventHandler
-    public void onIgnite(BlockIgniteEvent e) {
-        if (e.getCause() != BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) return;
-        Player player = e.getPlayer();
+    public void onIgnite(BlockIgniteEvent event) {
+        if (event.getCause() != BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) return;
+
+        Player player = event.getPlayer();
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
+
         if (!Utils.isUltimateArena(arena)) return;
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.DEMOLITION) return;
-        e.setCancelled(true);
+
+        event.setCancelled(true);
+
         if (cooldowns.containsKey(player)) return;
+
         cooldowns.put(player, new Cooldown(10));
-        Block ignited = e.getBlock().getRelative(BlockFace.DOWN);
+
+        Block ignited = event.getBlock().getRelative(BlockFace.DOWN);
         if (!ignited.getType().toString().endsWith("WOOL") || !arena.isBlockPlaced(ignited)) return;
+
         handleDemolition(player, arena, ignited);
     }
 
@@ -76,70 +87,87 @@ public class DemolitionListener implements Listener, Runnable {
     public void onKill(PlayerKillEvent event) {
         Player player = event.getVictim();
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
+
         if (!Utils.isUltimateArena(arena)) return;
+
         if (plugin.getUltimateManager().getUltimate(player) == Ultimate.DEMOLITION) {
             TNTPrimed tnt = (TNTPrimed) player.getWorld().spawnEntity(player.getLocation(), EntityType.PRIMED_TNT);
             tnt.setIsIncendiary(false);
             tnt.setMetadata("ultimate", new FixedMetadataValue(plugin, arena.getTeam(player).getName()));
         }
+
         Player killer = event.getKiller();
         if (killer == null) return;
+
         if (plugin.getUltimateManager().getUltimate(killer) == Ultimate.DEMOLITION) {
             killCount.merge(killer, 1, Integer::sum);
+
             if (killCount.get(killer) == 3) {
                 killCount.remove(killer);
-                killer.getInventory().addItem(new Random().nextBoolean() ? new ItemStack(Material.FIREBALL) : new ItemStack(Material.TNT));
+                killer.getInventory().addItem(new ItemStack(ThreadLocalRandom.current().nextBoolean() ? Material.FIREBALL : Material.TNT));
             }
         }
     }
 
     @EventHandler
-    public void onDamage(EntityDamageByEntityEvent e) {
-        if (!(e.getDamager() instanceof TNTPrimed) || !(e.getEntity() instanceof Player)) return;
-        Player player = (Player) e.getEntity();
-        TNTPrimed tnt = (TNTPrimed) e.getDamager();
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof TNTPrimed) || !(event.getEntity() instanceof Player)) return;
+
+        Player player = (Player) event.getEntity();
+        TNTPrimed tnt = (TNTPrimed) event.getDamager();
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
+
         if (!Utils.isUltimateArena(arena)) return;
         if (!tnt.hasMetadata("ultimate")) return;
+
         if (tnt.getMetadata("ultimate").get(0).asString().equals(arena.getTeam(player).getName())) {
-            e.setCancelled(true);
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onBedBreak(PlayerBedBreakEvent e) {
-        Player player = e.getPlayer();
+    public void onBedBreak(PlayerBedBreakEvent event) {
+        Player player = event.getPlayer();
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
+
         if (!Utils.isUltimateArena(arena)) return;
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.DEMOLITION) return;
-        ItemStack egg = new ItemBuilder("CREEPER_SPAWN_EGG").build();
-        player.getInventory().addItem(egg);
+
+        ItemStack item = new ItemBuilder("CREEPER_SPAWN_EGG").build();
+        player.getInventory().addItem(item);
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEvent e) {
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (e.getBlockFace() != BlockFace.UP) return;
-        Player player = e.getPlayer();
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getItem() == null || event.getItem().getType() != Material.MONSTER_EGG) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getBlockFace() != BlockFace.UP) return;
+
+        Player player = event.getPlayer();
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.DEMOLITION) return;
+
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
         if (!Utils.isUltimateArena(arena)) return;
-        if (e.getItem() == null) return;
-        if (e.getItem().getType() != Material.MONSTER_EGG) return;
-        SpawnEgg egg = (SpawnEgg) e.getItem().getData();
+
+        SpawnEgg egg = (SpawnEgg) event.getItem().getData();
         if (egg.getSpawnedType() != EntityType.CREEPER) return;
-        e.setCancelled(true);
-        e.getClickedBlock().getWorld().spawnEntity(e.getClickedBlock().getLocation().add(0, 1, 0), EntityType.CREEPER);
-        player.getInventory().remove(e.getItem());
+
+        event.setCancelled(true);
+        event.getClickedBlock().getWorld().spawnEntity(event.getClickedBlock().getLocation().add(0, 1, 0), EntityType.CREEPER);
+
+        player.getInventory().remove(event.getItem());
     }
 
     private void handleDemolition(Player player, IArena arena, Block block) {
         Set<Block> burning = new HashSet<>();
         Set<Block> blocks = new HashSet<>();
+
         blocks.add(block);
+
         for (int i = 0; i < 20; i++) {
             Set<Block> temp = new HashSet<>(blocks);
             blocks.clear();
+
             for (Block wool : temp) {
                 Block up = wool.getRelative(BlockFace.UP);
                 if (up.getType() == Material.AIR && arena.isBlockPlaced(wool)) {
@@ -149,21 +177,22 @@ public class DemolitionListener implements Listener, Runnable {
                 blocks.addAll(getNearbyWool(wool));
             }
         }
-        Random random = new Random();
+
         for (Block wool : burning) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> wool.setType(Material.AIR), random.nextInt(30) + 10);
+            Tasks.later(() -> wool.setType(Material.AIR), ThreadLocalRandom.current().nextInt(30) + 10);
         }
     }
 
     private Set<Block> getNearbyWool(Block block) {
-        Set<Block> wool = new HashSet<>();
+        Set<Block> blocks = new HashSet<>();
         for (BlockFace face : BlockFace.values()) {
             if (face == BlockFace.SELF) continue;
+
             if (block.getRelative(face).getType() == Material.WOOL) {
-                wool.add(block.getRelative(face));
+                blocks.add(block.getRelative(face));
             }
         }
-        return wool;
+        return blocks;
     }
 
     public void resetCooldown(Player player) {

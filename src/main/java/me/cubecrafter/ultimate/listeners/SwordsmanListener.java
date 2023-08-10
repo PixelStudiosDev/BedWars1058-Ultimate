@@ -3,7 +3,6 @@ package me.cubecrafter.ultimate.listeners;
 import com.andrei1058.bedwars.api.arena.GameState;
 import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
-import com.cryptomorin.xseries.XSound;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.config.Config;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
@@ -65,24 +64,26 @@ public class SwordsmanListener implements Listener, Runnable {
 
             for (Player player : arena.getPlayers()) {
                 if (plugin.getUltimateManager().getUltimate(player) != Ultimate.SWORDSMAN) continue;
+
                 if (!cooldowns.containsKey(player)) {
                     if (player.isBlocking() && (!blocking.containsKey(player) || blocking.get(player) < 40)) {
                         blocking.merge(player, 1, Integer::sum);
                         player.setExp(blocking.get(player) / 40f);
+
                         if (blocking.get(player) % 5 == 0) {
                             SoundUtil.play(player, Config.SWORDSMAN_LOADING_SOUND.getAsString());
                         }
                     } else if (!player.isBlocking() && blocking.containsKey(player)) {
                         recall.put(player, player.getLocation());
+
                         player.setVelocity(player.getLocation().getDirection().multiply(blocking.get(player) * 0.08).setY(blocking.get(player) * 0.03));
-                        XSound.play(player, "FIREWORK_LAUNCH");
+                        SoundUtil.play(player, "FIREWORK_LAUNCH");
+
                         blocking.remove(player);
                         cooldowns.put(player, new Cooldown(10));
                     }
                 } else if (cooldowns.get(player).getSecondsLeft() > 5 && player.isBlocking() && recall.containsKey(player)) {
-                    Location location = recall.get(player);
-                    player.teleport(location);
-                    recall.remove(player);
+                    player.teleport(recall.remove(player));
                     SoundUtil.play(player, "ENDERMAN_TELEPORT");
                 }
             }
@@ -91,10 +92,12 @@ public class SwordsmanListener implements Listener, Runnable {
         for (Map.Entry<Player, Cooldown> entry : cooldowns.entrySet()) {
             Player player = entry.getKey();
             Cooldown cooldown = entry.getValue();
+
             if (cooldown.isExpired()) {
                 resetCooldown(player);
                 continue;
             }
+
             player.setExp(cooldown.getPercentageLeft());
             player.setLevel(cooldown.getSecondsLeft());
         }
