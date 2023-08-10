@@ -8,7 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.util.List;
 
 @RequiredArgsConstructor
-public enum Configuration {
+public enum Config {
 
     ARENA_GROUPS("arena-groups"),
     DISABLE_FALL_DAMAGE("disable-fall-damage"),

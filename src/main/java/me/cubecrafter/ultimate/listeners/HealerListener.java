@@ -3,14 +3,13 @@ package me.cubecrafter.ultimate.listeners;
 import com.andrei1058.bedwars.api.arena.GameState;
 import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
-import com.cryptomorin.xseries.XSound;
-import com.cryptomorin.xseries.particles.ParticleDisplay;
-import com.cryptomorin.xseries.particles.XParticle;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
 import me.cubecrafter.ultimate.utils.Cooldown;
 import me.cubecrafter.ultimate.utils.Utils;
-import org.bukkit.Bukkit;
+import me.cubecrafter.xutils.SoundUtil;
+import me.cubecrafter.xutils.Tasks;
+import me.cubecrafter.xutils.item.ItemUtil;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -24,52 +23,66 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HealerListener implements Listener, Runnable {
 
     private final UltimatePlugin plugin;
+
     private final Map<Player, Cooldown> cooldowns = new HashMap<>();
     private final Map<Player, BukkitTask> potionTasks = new HashMap<>();
     private final Map<Player, BukkitTask> healTasks = new HashMap<>();
+
     public HealerListener(UltimatePlugin plugin) {
         this.plugin = plugin;
+
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, this, 0L, 1L);
+        Tasks.repeat(this, 0L, 1L);
     }
 
     @EventHandler
-    public void onSplash(PotionSplashEvent e) {
-        ThrownPotion potion = e.getPotion();
+    public void onSplash(PotionSplashEvent event) {
+        ThrownPotion potion = event.getPotion();
         if (!(potion.getShooter() instanceof Player)) return;
+
         Player player = (Player) potion.getShooter();
+
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.HEALER) return;
-        if (!Utils.getTag(potion.getItem(), "ultimate").equals("healer-item")) return;
-        e.setCancelled(true);
+
+        String tag = ItemUtil.getTag(potion.getItem(), "ultimate");
+        if (tag == null || !tag.equals("healer-item")) return;
+
+        event.setCancelled(true);
+
         ITeam team = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player).getTeam(player);
         Location location = potion.getLocation();
         Cooldown cooldown = new Cooldown(30);
-        BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            List<Player> nearbyPlayers = potion.getNearbyEntities(2.5, 2.5, 2.5).stream().filter(entity -> entity.getType().equals(EntityType.PLAYER)).map(entity -> (Player) entity).collect(Collectors.toList());
-            for (Player nearby : nearbyPlayers) {
-                if (!team.isMember(nearby)) continue;
-                nearby.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 0));
-            }
+
+        BukkitTask task = Tasks.repeat(() -> {
+            potion.getNearbyEntities(2.5, 2.5, 2.5).stream()
+                    .filter(entity -> entity.getType().equals(EntityType.PLAYER))
+                    .map(entity -> (Player) entity)
+                    .filter(team::isMember)
+                    .forEach(member -> {
+                        member.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 0));
+                    });
+
             for (double i = 0.3; i < 2.5; i += 0.4) {
                 for (int degree = 0; degree < 360; degree += (30 / i)) {
                     double radians = Math.toRadians(degree);
                     double x = Math.cos(radians) * i;
                     double z = Math.sin(radians) * i;
+
                     location.getWorld().playEffect(location.clone().add(x, 0.1, z), Effect.HAPPY_VILLAGER, 1);
                 }
             }
+
             if (cooldown.isExpired()) {
                 potionTasks.get(player).cancel();
                 potionTasks.remove(player);
             }
         }, 0L, 20L);
+
         potionTasks.put(player, task);
     }
 
@@ -77,13 +90,17 @@ public class HealerListener implements Listener, Runnable {
     public void run() {
         for (IArena arena : plugin.getBedWars().getArenaUtil().getArenas()) {
             if (arena.getStatus() != GameState.playing) continue;
+            if (!Utils.isUltimateArena(arena)) continue;
+
             for (Player player : arena.getPlayers()) {
-                if (plugin.getUltimateManager().getUltimate(player) != Ultimate.HEALER) continue;
                 if (!player.isBlocking()) continue;
+                if (plugin.getUltimateManager().getUltimate(player) != Ultimate.HEALER) continue;
                 if (cooldowns.containsKey(player)) continue;
+
                 cooldowns.put(player, new Cooldown(20));
-                XSound.play(player, "NOTE_PLING");
-                BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                SoundUtil.play(player, "NOTE_PLING");
+
+                BukkitTask task = Tasks.repeat(() -> {
                     if (player.getHealth() < player.getMaxHealth()) {
                         player.setHealth(player.getHealth() + 1);
                     } else {
@@ -91,16 +108,20 @@ public class HealerListener implements Listener, Runnable {
                         healTasks.remove(player);
                     }
                 }, 0L, 20L);
+
                 healTasks.put(player, task);
             }
         }
+
         for (Map.Entry<Player, Cooldown> entry : cooldowns.entrySet()) {
             Player player = entry.getKey();
             Cooldown cooldown = entry.getValue();
+
             if (cooldown.isExpired()) {
                 resetCooldown(player);
                 continue;
             }
+
             player.setExp(cooldown.getPercentageLeft());
             player.setLevel(cooldown.getSecondsLeft());
         }

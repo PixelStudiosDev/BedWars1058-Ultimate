@@ -19,6 +19,7 @@ public class GathererListener implements Listener {
 
     public GathererListener(UltimatePlugin plugin) {
         this.plugin = plugin;
+
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 

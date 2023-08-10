@@ -6,11 +6,12 @@ import com.andrei1058.bedwars.api.arena.team.ITeam;
 import com.cryptomorin.xseries.ReflectionUtils;
 import com.cryptomorin.xseries.XSound;
 import me.cubecrafter.ultimate.UltimatePlugin;
-import me.cubecrafter.ultimate.config.Configuration;
+import me.cubecrafter.ultimate.config.Config;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
-import me.cubecrafter.ultimate.utils.TextUtil;
 import me.cubecrafter.ultimate.utils.Utils;
-import org.bukkit.Bukkit;
+import me.cubecrafter.xutils.Tasks;
+import me.cubecrafter.xutils.item.ItemUtil;
+import me.cubecrafter.xutils.text.TextUtil;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -33,8 +34,9 @@ public class BuilderListener implements Listener, Runnable {
 
     public BuilderListener(UltimatePlugin plugin) {
         this.plugin = plugin;
+
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, this, 0, 20L);
+        Tasks.repeat(this, 0, 20L);
     }
 
     @EventHandler
@@ -46,16 +48,17 @@ public class BuilderListener implements Listener, Runnable {
         if (!Utils.isUltimateArena(arena)) return;
         Ultimate ultimate = plugin.getUltimateManager().getUltimate(player);
         if (ultimate != Ultimate.BUILDER) return;
-        String tag = Utils.getTag(item, "ultimate");
+        String tag = ItemUtil.getTag(item, "ultimate");
+        if (tag == null) return;
         if (tag.equals("wall-item")) {
             if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 player.getInventory().setItem(player.getInventory().getHeldItemSlot(), Utils.getBridgeItem());
             } else if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                if (Utils.isBed(e.getClickedBlock().getType())) {
+                if (Utils.isBed(e.getClickedBlock())) {
                     protectBed(player, arena, e.getClickedBlock());
                 } else {
                     if (arena.isProtected(e.getClickedBlock().getRelative(e.getBlockFace()).getLocation())) {
-                        TextUtil.sendMessage(player, Configuration.CANT_PLACE.getAsString());
+                        TextUtil.sendMessage(player, Config.CANT_PLACE.getAsString());
                         return;
                     }
                     buildWall(player, e.getClickedBlock(), arena, e.getBlockFace());
@@ -66,11 +69,11 @@ public class BuilderListener implements Listener, Runnable {
             if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 player.getInventory().setItem(player.getInventory().getHeldItemSlot(), Utils.getWallItem());
             } else if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                if (Utils.isBed(e.getClickedBlock().getType())) {
+                if (Utils.isBed(e.getClickedBlock())) {
                     protectBed(player, arena, e.getClickedBlock());
                 } else {
                     if (arena.isProtected(e.getClickedBlock().getRelative(e.getBlockFace()).getLocation())) {
-                        TextUtil.sendMessage(player, Configuration.CANT_PLACE.getAsString());
+                        TextUtil.sendMessage(player, Config.CANT_PLACE.getAsString());
                         return;
                     }
                     buildBridge(player, e.getClickedBlock(), arena, e.getBlockFace());
@@ -107,7 +110,7 @@ public class BuilderListener implements Listener, Runnable {
                     block = block.getRelative(clickedFace);
                 }
                 if (arena.isProtected(block.getLocation())) {
-                    TextUtil.sendMessage(player, Configuration.CANT_BUILD_BRIDGE.getAsString());
+                    TextUtil.sendMessage(player, Config.CANT_BUILD_BRIDGE.getAsString());
                     cancel();
                     return;
                 }
@@ -127,7 +130,7 @@ public class BuilderListener implements Listener, Runnable {
                         player.getInventory().setItem(wool, null);
                     }
                 } else {
-                    TextUtil.sendMessage(player, Configuration.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
+                    TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
                     cancel();
                     return;
                 }
@@ -178,7 +181,7 @@ public class BuilderListener implements Listener, Runnable {
             public void run() {
                 for (Block block : row) {
                     if (arena.isProtected(block.getLocation())) {
-                        TextUtil.sendMessage(player, Configuration.CANT_WALL_BRIDGE.getAsString());
+                        TextUtil.sendMessage(player, Config.CANT_WALL_BRIDGE.getAsString());
                         cancel();
                         return;
                     }
@@ -193,7 +196,7 @@ public class BuilderListener implements Listener, Runnable {
                             player.getInventory().setItem(wool, null);
                         }
                     } else {
-                        TextUtil.sendMessage(player, Configuration.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
+                        TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
                         cancel();
                         continue;
                     }
@@ -220,12 +223,12 @@ public class BuilderListener implements Listener, Runnable {
     private void protectBed(Player player, IArena arena, Block block) {
         ITeam team = arena.getTeam(player);
         if (team.getBed().distanceSquared(block.getLocation()) > 1) {
-            TextUtil.sendMessage(player, Configuration.CANT_PROTECT_BED.getAsString());
+            TextUtil.sendMessage(player, Config.CANT_PROTECT_BED.getAsString());
             return;
         }
         int slot = player.getInventory().first(Material.WOOL);
         if (slot == -1) {
-            TextUtil.sendMessage(player, Configuration.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
+            TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
             return;
         }
         Bed bed = new Bed(block.getType(), block.getData());
@@ -250,7 +253,7 @@ public class BuilderListener implements Listener, Runnable {
                         player.getInventory().clear(wool);
                     }
                 } else {
-                    TextUtil.sendMessage(player, Configuration.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
+                    TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
                     return;
                 }
                 if (ReflectionUtils.supports(13)) {

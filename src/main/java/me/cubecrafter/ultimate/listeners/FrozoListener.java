@@ -6,8 +6,9 @@ import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
 import com.cryptomorin.xseries.XMaterial;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
-import me.cubecrafter.ultimate.utils.ItemBuilder;
 import me.cubecrafter.ultimate.utils.Utils;
+import me.cubecrafter.xutils.item.ItemBuilder;
+import me.cubecrafter.xutils.item.ItemUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
@@ -28,6 +29,7 @@ public class FrozoListener implements Listener {
 
     public FrozoListener(UltimatePlugin plugin) {
         this.plugin = plugin;
+
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -38,7 +40,8 @@ public class FrozoListener implements Listener {
         Player player = (Player) potion.getShooter();
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
         if (!Utils.isUltimateArena(arena)) return;
-        if (!Utils.getTag(potion.getItem(), "ultimate").equals("frozo-item")) return;
+        String tag = ItemUtil.getTag(potion.getItem(), "ultimate");
+        if (tag == null || !tag.equals("frozo-item")) return;
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.FROZO) return;
         e.setCancelled(true);
         ITeam team = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player).getTeam(player);
@@ -66,8 +69,11 @@ public class FrozoListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onInteract(PlayerInteractEvent event){
-        if(Utils.isUltimateItem(event.getItem())) event.setCancelled(true);
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onInteract(PlayerInteractEvent event) {
+        if (Utils.isUltimateItem(event.getItem())) {
+            event.setCancelled(true);
+        }
     }
+
 }

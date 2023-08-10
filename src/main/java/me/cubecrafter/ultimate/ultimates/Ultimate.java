@@ -2,19 +2,20 @@ package me.cubecrafter.ultimate.ultimates;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import me.cubecrafter.ultimate.config.Configuration;
+import me.cubecrafter.ultimate.config.Config;
 
+@Getter
 @RequiredArgsConstructor
 public enum Ultimate {
 
-    KANGAROO(Configuration.KANGAROO_DISPLAYNAME.getAsString()),
-    SWORDSMAN(Configuration.SWORDSMAN_DISPLAYNAME.getAsString()),
-    HEALER(Configuration.HEALER_DISPLAYNAME.getAsString()),
-    FROZO(Configuration.FROZO_DISPLAYNAME.getAsString()),
-    BUILDER(Configuration.BUILDER_DISPLAYNAME.getAsString()),
-    DEMOLITION(Configuration.DEMOLITION_DISPLAYNAME.getAsString()),
-    GATHERER(Configuration.GATHERER_DISPLAYNAME.getAsString());
+    KANGAROO(Config.KANGAROO_DISPLAYNAME.getAsString()),
+    SWORDSMAN(Config.SWORDSMAN_DISPLAYNAME.getAsString()),
+    HEALER(Config.HEALER_DISPLAYNAME.getAsString()),
+    FROZO(Config.FROZO_DISPLAYNAME.getAsString()),
+    BUILDER(Config.BUILDER_DISPLAYNAME.getAsString()),
+    DEMOLITION(Config.DEMOLITION_DISPLAYNAME.getAsString()),
+    GATHERER(Config.GATHERER_DISPLAYNAME.getAsString());
 
-    @Getter private final String name;
+    private final String name;
 
 }

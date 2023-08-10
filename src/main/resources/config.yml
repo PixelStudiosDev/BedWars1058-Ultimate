@@ -53,12 +53,12 @@ shop-category:
   already-selected-sound: VILLAGER_NO
   category-item:
     material: "BEACON"
-    displayname: "&aUltimates"
+    name: "&aUltimates"
     lore:
       - "&eClick to view!"
   kangaroo-item:
     material: "RABBIT_FOOT"
-    displayname: "&aKangaroo"
+    name: "&aKangaroo"
     lore:
       - "&7• Double Jump!"
       - "&7• Keep resources on death!"
@@ -71,7 +71,7 @@ shop-category:
     slot: 19
   swordsman-item:
     material: "GOLDEN_SWORD"
-    displayname: "&aSwordsman"
+    name: "&aSwordsman"
     lore:
       - "&7• Hold right click on a sword"
       - "&7to dash forward!"
@@ -86,7 +86,7 @@ shop-category:
     slot: 20
   healer-item:
     material: "GOLDEN_APPLE"
-    displayname: "&aHealer"
+    name: "&aHealer"
     lore:
       - "&7• Hold right click on a sword"
       - "&7to heal yourself!"
@@ -99,7 +99,7 @@ shop-category:
     slot: 21
   frozo-item:
     material: "SNOW_BLOCK"
-    displayname: "&aFrozo"
+    name: "&aFrozo"
     lore:
       - "&7• Throw down potion to slow"
       - "&7down enemies!"
@@ -111,7 +111,7 @@ shop-category:
     slot: 22
   builder-item:
     material: "BRICKS"
-    displayname: "&aBuilder"
+    name: "&aBuilder"
     lore:
       - "&7• Build bridges!"
       - "&7• Build walls!"
@@ -126,7 +126,7 @@ shop-category:
     slot: 23
   demolition-item:
     material: "FLINT_AND_STEEL"
-    displayname: "&aDemolition"
+    name: "&aDemolition"
     lore:
       - "&7• Burn wool in a radius!"
       - "&7• Drops TNT on death!"
@@ -141,7 +141,7 @@ shop-category:
     slot: 24
   gatherer-item:
     material: "ENDER_CHEST"
-    displayname: "&aGatherer"
+    name: "&aGatherer"
     lore:
       - "&7• Duplicate picked up"
       - "&7diamonds/emeralds from"

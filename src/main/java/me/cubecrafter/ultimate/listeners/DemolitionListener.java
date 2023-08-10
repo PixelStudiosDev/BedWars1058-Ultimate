@@ -6,8 +6,9 @@ import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
 import me.cubecrafter.ultimate.utils.Cooldown;
-import me.cubecrafter.ultimate.utils.ItemBuilder;
 import me.cubecrafter.ultimate.utils.Utils;
+import me.cubecrafter.xutils.Tasks;
+import me.cubecrafter.xutils.item.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,13 +31,15 @@ import java.util.*;
 public class DemolitionListener implements Listener, Runnable {
 
     private final UltimatePlugin plugin;
+
     private final Map<Player, Integer> killCount = new HashMap<>();
     private final Map<Player, Cooldown> cooldowns = new HashMap<>();
 
     public DemolitionListener(UltimatePlugin plugin) {
         this.plugin = plugin;
+
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, this, 0, 1L);
+        Tasks.repeat(this, 0, 1L);
     }
 
     @Override

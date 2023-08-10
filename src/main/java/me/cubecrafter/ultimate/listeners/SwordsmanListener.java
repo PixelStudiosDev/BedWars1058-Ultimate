@@ -5,11 +5,12 @@ import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
 import com.cryptomorin.xseries.XSound;
 import me.cubecrafter.ultimate.UltimatePlugin;
-import me.cubecrafter.ultimate.config.Configuration;
+import me.cubecrafter.ultimate.config.Config;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
 import me.cubecrafter.ultimate.utils.Cooldown;
 import me.cubecrafter.ultimate.utils.Utils;
-import org.bukkit.Bukkit;
+import me.cubecrafter.xutils.SoundUtil;
+import me.cubecrafter.xutils.Tasks;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,19 +23,22 @@ import java.util.Map;
 public class SwordsmanListener implements Listener, Runnable {
 
     private final UltimatePlugin plugin;
+
     private final Map<Player, Cooldown> cooldowns = new HashMap<>();
     private final Map<Player, Integer> blocking = new HashMap<>();
     private final Map<Player, Location> recall = new HashMap<>();
 
     public SwordsmanListener(UltimatePlugin plugin) {
         this.plugin = plugin;
+
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, this, 0L, 1L);
+        Tasks.repeat(this, 0L, 1L);
     }
 
     @EventHandler
-    public void onHotbarSlotChange(PlayerItemHeldEvent e) {
-        Player player = e.getPlayer();
+    public void onHotbarSlotChange(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+
         if (blocking.containsKey(player)) {
             blocking.remove(player);
             player.setExp(0);
@@ -42,10 +46,13 @@ public class SwordsmanListener implements Listener, Runnable {
     }
 
     @EventHandler
-    public void onKill(PlayerKillEvent e) {
-        if (e.getKiller() == null) return;
-        Player player = e.getKiller();
+    public void onKill(PlayerKillEvent event) {
+        if (event.getKiller() == null) return;
+        if (!Utils.isUltimateArena(event.getArena())) return;
+
+        Player player = event.getKiller();
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.SWORDSMAN) return;
+
         resetCooldown(player);
         player.setHealth(player.getHealth() + 2);
     }
@@ -53,8 +60,9 @@ public class SwordsmanListener implements Listener, Runnable {
     @Override
     public void run() {
         for (IArena arena : plugin.getBedWars().getArenaUtil().getArenas()) {
-            if (!Utils.isUltimateArena(arena)) continue;
             if (arena.getStatus() != GameState.playing) continue;
+            if (!Utils.isUltimateArena(arena)) continue;
+
             for (Player player : arena.getPlayers()) {
                 if (plugin.getUltimateManager().getUltimate(player) != Ultimate.SWORDSMAN) continue;
                 if (!cooldowns.containsKey(player)) {
@@ -62,7 +70,7 @@ public class SwordsmanListener implements Listener, Runnable {
                         blocking.merge(player, 1, Integer::sum);
                         player.setExp(blocking.get(player) / 40f);
                         if (blocking.get(player) % 5 == 0) {
-                            XSound.play(player, Configuration.SWORDSMAN_LOADING_SOUND.getAsString());
+                            SoundUtil.play(player, Config.SWORDSMAN_LOADING_SOUND.getAsString());
                         }
                     } else if (!player.isBlocking() && blocking.containsKey(player)) {
                         recall.put(player, player.getLocation());
@@ -75,10 +83,11 @@ public class SwordsmanListener implements Listener, Runnable {
                     Location location = recall.get(player);
                     player.teleport(location);
                     recall.remove(player);
-                    XSound.play(player, "ENDERMAN_TELEPORT");
+                    SoundUtil.play(player, "ENDERMAN_TELEPORT");
                 }
             }
         }
+
         for (Map.Entry<Player, Cooldown> entry : cooldowns.entrySet()) {
             Player player = entry.getKey();
             Cooldown cooldown = entry.getValue();
