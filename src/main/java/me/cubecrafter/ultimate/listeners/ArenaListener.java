@@ -103,6 +103,8 @@ public class ArenaListener implements Listener {
 
         Utils.clearUltimateItems(player);
         Utils.resetCooldowns(player);
+
+        plugin.getUltimateManager().clearUltimate(player);
     }
 
 }

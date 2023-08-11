@@ -20,6 +20,10 @@ public class UltimateManager {
     private final Map<UUID, Cooldown> cooldowns = new HashMap<>();
     private final List<IArena> arenas = new ArrayList<>();
 
+    public void clearUltimate(Player player) {
+        ultimates.remove(player.getUniqueId());
+    }
+
     public void setUltimate(Player player, Ultimate type) {
         if (getUltimate(player) == type) {
             TextUtil.sendMessage(player, Config.MESSAGE_ULTIMATE_ALREADY_SELECTED.getAsString());
