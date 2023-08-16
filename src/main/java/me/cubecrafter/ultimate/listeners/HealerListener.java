@@ -54,15 +54,16 @@ public class HealerListener implements Listener, Runnable {
 
         event.setCancelled(true);
 
-        ITeam team = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player).getTeam(player);
+        IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
+        ITeam team = arena.getTeam(player);
         Location location = potion.getLocation();
         Cooldown cooldown = new Cooldown(30);
 
         BukkitTask task = Tasks.repeat(() -> {
             potion.getNearbyEntities(2.5, 2.5, 2.5).stream()
-                    .filter(entity -> entity.getType().equals(EntityType.PLAYER))
+                    .filter(entity -> entity.getType() == EntityType.PLAYER)
                     .map(entity -> (Player) entity)
-                    .filter(team::isMember)
+                    .filter(team::isMember).filter(member -> !arena.isReSpawning(member))
                     .forEach(member -> {
                         member.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 0));
                     });

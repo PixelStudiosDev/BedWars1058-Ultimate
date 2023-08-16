@@ -10,15 +10,28 @@ import com.andrei1058.bedwars.api.events.player.PlayerReSpawnEvent;
 import lombok.RequiredArgsConstructor;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.config.Config;
+import me.cubecrafter.ultimate.ultimates.Ultimate;
 import me.cubecrafter.ultimate.utils.Utils;
+import me.cubecrafter.xutils.NumberUtil;
 import me.cubecrafter.xutils.SoundUtil;
 import me.cubecrafter.xutils.Tasks;
 import me.cubecrafter.xutils.text.TextUtil;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RequiredArgsConstructor
 public class ArenaListener implements Listener {
@@ -27,7 +40,7 @@ public class ArenaListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (!Config.DISABLE_FALL_DAMAGE.getAsBoolean()) return;
+        if (!Config.DISABLE_FALL_DAMAGE.asBoolean()) return;
         if (!(event.getEntity() instanceof Player)) return;
         if (event.getCause() != EntityDamageEvent.DamageCause.FALL) return;
 
@@ -62,15 +75,15 @@ public class ArenaListener implements Listener {
         if (event.getNewState() != GameState.playing) return;
 
         IArena arena = event.getArena();
-        if (!Config.ARENA_GROUPS.getAsStringList().contains(arena.getGroup())) return;
+        if (!Config.ARENA_GROUPS.asStringList().contains(arena.getGroup())) return;
 
         Tasks.later(() -> {
             plugin.getUltimateManager().registerArena(arena);
             arena.getPlayers().forEach(Utils::giveUltimateItems);
 
-            TextUtil.sendMessages(arena.getPlayers(), Config.MESSAGE_ULTIMATES_ENABLED.getAsStringList());
-            SoundUtil.play(arena.getPlayers(), Config.ULTIMATES_ENABLED_SOUND.getAsString());
-        }, Config.ULTIMATES_ENABLED_DELAY.getAsInt() * 20L);
+            TextUtil.sendMessages(arena.getPlayers(), Config.MESSAGE_ULTIMATES_ENABLED.asStringList());
+            SoundUtil.play(arena.getPlayers(), Config.ULTIMATES_ENABLED_SOUND.asString());
+        }, Config.ULTIMATES_ENABLED_DELAY.asInt() * 20L);
     }
 
     @EventHandler
@@ -83,15 +96,23 @@ public class ArenaListener implements Listener {
         for (Player player : arena.getPlayers()) {
             Utils.clearUltimateItems(player);
             Utils.resetCooldowns(player);
+
+            plugin.getUltimateManager().clearUltimate(player);
         }
     }
 
-    @EventHandler
-    public void onDeath(PlayerKillEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onKill(PlayerKillEvent event) {
+        Player player = event.getVictim();
         IArena arena = event.getArena();
         if (!Utils.isUltimateArena(arena)) return;
 
-        Utils.resetCooldowns(event.getVictim());
+        Utils.resetCooldowns(player);
+
+        if (event.getCause().isFinalKill()) {
+            Utils.clearUltimateItems(player);
+            plugin.getUltimateManager().clearUltimate(player);
+        }
     }
 
     @EventHandler
@@ -105,6 +126,11 @@ public class ArenaListener implements Listener {
         Utils.resetCooldowns(player);
 
         plugin.getUltimateManager().clearUltimate(player);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDeath(PlayerDeathEvent event) {
+        event.getDrops().removeIf(Utils::isUltimateItem);
     }
 
 }

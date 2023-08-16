@@ -6,7 +6,7 @@
 
     <groupId>me.cubecrafter</groupId>
     <artifactId>BedWars1058-Ultimate</artifactId>
-    <version>1.1.0-BETA</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>BedWars1058-Ultimate</name>
@@ -43,10 +43,6 @@
                                 <relocation>
                                     <pattern>me.cubecrafter.xutils</pattern>
                                     <shadedPattern>me.cubecrafter.ultimate.libs.xutils</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>de.tr7zw.changeme.nbtapi</pattern>
-                                    <shadedPattern>me.cubecrafter.ultimate.libs.nbtapi</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
@@ -85,10 +81,6 @@
             <id>jitpack</id>
             <url>https://jitpack.io</url>
         </repository>
-        <repository>
-            <id>codemc</id>
-            <url>https://repo.codemc.org/repository/maven-public/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -124,12 +116,7 @@
         <dependency>
             <groupId>com.github.pixelstudiosdev</groupId>
             <artifactId>xutils</artifactId>
-            <version>179127de7e</version>
-        </dependency>
-        <dependency>
-            <groupId>de.tr7zw</groupId>
-            <artifactId>item-nbt-api</artifactId>
-            <version>2.11.3</version>
+            <version>8cc8037d42</version>
         </dependency>
     </dependencies>
 </project>

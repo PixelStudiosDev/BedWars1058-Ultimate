@@ -26,8 +26,8 @@ public class UltimateManager {
 
     public void setUltimate(Player player, Ultimate type) {
         if (getUltimate(player) == type) {
-            TextUtil.sendMessage(player, Config.MESSAGE_ULTIMATE_ALREADY_SELECTED.getAsString());
-            SoundUtil.play(player, Config.ALREADY_SELECTED_SOUND.getAsString());
+            TextUtil.sendMessage(player, Config.MESSAGE_ULTIMATE_ALREADY_SELECTED.asString());
+            SoundUtil.play(player, Config.ALREADY_SELECTED_SOUND.asString());
             return;
         }
 
@@ -36,20 +36,20 @@ public class UltimateManager {
         if (cooldowns.containsKey(uuid)) {
             Cooldown cooldown = cooldowns.get(uuid);
             if (!cooldown.isExpired()) {
-                TextUtil.sendMessage(player, Config.MESSAGE_SWITCH_COOLDOWN.getAsString().replace("{seconds}", String.valueOf(cooldown.getSecondsLeft())));
-                SoundUtil.play(player, Config.ALREADY_SELECTED_SOUND.getAsString());
+                TextUtil.sendMessage(player, Config.MESSAGE_SWITCH_COOLDOWN.asString().replace("{seconds}", String.valueOf(cooldown.getSecondsLeft())));
+                SoundUtil.play(player, Config.ALREADY_SELECTED_SOUND.asString());
                 return;
             }
             cooldowns.remove(uuid);
         }
 
-        cooldowns.put(uuid, new Cooldown(Config.SWITCH_COOLDOWN.getAsInt()));
+        cooldowns.put(uuid, new Cooldown(Config.SWITCH_COOLDOWN.asInt()));
         ultimates.put(player.getUniqueId(), type);
 
         Utils.giveUltimateItems(player);
 
-        TextUtil.sendMessage(player, Config.MESSAGE_ULTIMATE_SELECTED.getAsString().replace("{ultimate}", type.getName()));
-        SoundUtil.play(player, Config.SWITCH_SOUND.getAsString());
+        TextUtil.sendMessage(player, Config.MESSAGE_ULTIMATE_SELECTED.asString().replace("{ultimate}", type.getName()));
+        SoundUtil.play(player, Config.SWITCH_SOUND.asString());
     }
 
     public Ultimate getUltimate(Player player) {

@@ -17,6 +17,7 @@ public enum Config {
     ULTIMATES_ENABLED_SOUND("arena-enable-ultimates-sound"),
     KANGAROO_ENABLED("ultimates.kangaroo.enabled"),
     KANGAROO_DISPLAYNAME("ultimates.kangaroo.displayname"),
+    KANGAROO_KEEP_RESOURCES_CHANCE("ultimates.kangaroo.keep-resources-chance"),
     SWORDSMAN_ENABLED("ultimates.swordsman.enabled"),
     SWORDSMAN_DISPLAYNAME("ultimates.swordsman.displayname"),
     SWORDSMAN_LOADING_SOUND("ultimates.swordsman.loading-sound"),
@@ -69,27 +70,23 @@ public enum Config {
     private static final YamlConfiguration config = UltimatePlugin.getInstance().getFileManager().getConfig();
     private final String path;
 
-    public String getAsString() {
+    public String asString() {
         return config.getString(path);
     }
 
-    public int getAsInt() {
+    public int asInt() {
         return config.getInt(path);
     }
 
-    public double getAsDouble() {
-        return config.getDouble(path);
-    }
-
-    public List<String> getAsStringList() {
+    public List<String> asStringList() {
         return config.getStringList(path);
     }
 
-    public boolean getAsBoolean() {
+    public boolean asBoolean() {
         return config.getBoolean(path);
     }
 
-    public ConfigurationSection getAsConfigSection() {
+    public ConfigurationSection asSection() {
         return config.getConfigurationSection(path);
     }
 

@@ -8,13 +8,13 @@ import me.cubecrafter.ultimate.config.Config;
 @RequiredArgsConstructor
 public enum Ultimate {
 
-    KANGAROO(Config.KANGAROO_DISPLAYNAME.getAsString()),
-    SWORDSMAN(Config.SWORDSMAN_DISPLAYNAME.getAsString()),
-    HEALER(Config.HEALER_DISPLAYNAME.getAsString()),
-    FROZO(Config.FROZO_DISPLAYNAME.getAsString()),
-    BUILDER(Config.BUILDER_DISPLAYNAME.getAsString()),
-    DEMOLITION(Config.DEMOLITION_DISPLAYNAME.getAsString()),
-    GATHERER(Config.GATHERER_DISPLAYNAME.getAsString());
+    KANGAROO(Config.KANGAROO_DISPLAYNAME.asString()),
+    SWORDSMAN(Config.SWORDSMAN_DISPLAYNAME.asString()),
+    HEALER(Config.HEALER_DISPLAYNAME.asString()),
+    FROZO(Config.FROZO_DISPLAYNAME.asString()),
+    BUILDER(Config.BUILDER_DISPLAYNAME.asString()),
+    DEMOLITION(Config.DEMOLITION_DISPLAYNAME.asString()),
+    GATHERER(Config.GATHERER_DISPLAYNAME.asString());
 
     private final String name;
 

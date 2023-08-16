@@ -7,6 +7,7 @@ import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
 import me.cubecrafter.ultimate.utils.Cooldown;
 import me.cubecrafter.ultimate.utils.Utils;
+import me.cubecrafter.xutils.BlockUtil;
 import me.cubecrafter.xutils.Tasks;
 import me.cubecrafter.xutils.item.ItemBuilder;
 import org.bukkit.Material;
@@ -77,10 +78,11 @@ public class DemolitionListener implements Listener, Runnable {
 
         cooldowns.put(player, new Cooldown(10));
 
-        Block ignited = event.getBlock().getRelative(BlockFace.DOWN);
+        BlockFace face = BlockUtil.getTargetedFace(event.getPlayer());
+        Block ignited = event.getBlock().getRelative(face.getOppositeFace());
         if (!ignited.getType().toString().endsWith("WOOL") || !arena.isBlockPlaced(ignited)) return;
 
-        handleDemolition(player, arena, ignited);
+        handleDemolition(arena, ignited);
     }
 
     @EventHandler
@@ -158,7 +160,7 @@ public class DemolitionListener implements Listener, Runnable {
         player.getInventory().remove(event.getItem());
     }
 
-    private void handleDemolition(Player player, IArena arena, Block block) {
+    private void handleDemolition(IArena arena, Block block) {
         Set<Block> burning = new HashSet<>();
         Set<Block> blocks = new HashSet<>();
 
@@ -169,17 +171,23 @@ public class DemolitionListener implements Listener, Runnable {
             blocks.clear();
 
             for (Block wool : temp) {
-                Block up = wool.getRelative(BlockFace.UP);
-                if (up.getType() == Material.AIR && arena.isBlockPlaced(wool)) {
-                    up.setType(Material.FIRE);
+
+                if (arena.isBlockPlaced(wool)) {
                     burning.add(wool);
+
+                    Block fire = wool.getRelative(BlockFace.UP);
+
+                    if (fire.getType() == Material.AIR) {
+                        fire.setType(Material.FIRE);
+                    }
                 }
+
                 blocks.addAll(getNearbyWool(wool));
             }
         }
 
         for (Block wool : burning) {
-            Tasks.later(() -> wool.setType(Material.AIR), ThreadLocalRandom.current().nextInt(30) + 10);
+            Tasks.later(() -> wool.setType(Material.AIR), ThreadLocalRandom.current().nextInt(10, 40));
         }
     }
 
@@ -188,7 +196,7 @@ public class DemolitionListener implements Listener, Runnable {
         for (BlockFace face : BlockFace.values()) {
             if (face == BlockFace.SELF) continue;
 
-            if (block.getRelative(face).getType() == Material.WOOL) {
+            if (block.getRelative(face).getType().toString().endsWith("WOOL")) {
                 blocks.add(block.getRelative(face));
             }
         }

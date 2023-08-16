@@ -28,10 +28,11 @@ public class InventoryListener implements Listener {
         Player player = (Player) event.getPlayer();
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
 
-        if (arena == null || !Config.ARENA_GROUPS.getAsStringList().contains(arena.getGroup())) return;
+        if (arena == null || !Config.ARENA_GROUPS.asStringList().contains(arena.getGroup())) return;
         if (!isShop(player, event.getView().getTitle())) return;
 
-        event.getInventory().setItem(8, ItemBuilder.fromConfig(Config.CATEGORY_ITEM.getAsConfigSection()).setTag("ultimate", "category-item").build());
+        ItemStack item = ItemBuilder.fromConfig(Config.CATEGORY_ITEM.asSection()).setTag("ultimate", "category-item").build();
+        event.getInventory().setItem(8, item);
     }
 
     @EventHandler
@@ -48,8 +49,9 @@ public class InventoryListener implements Listener {
         String tag = ItemUtil.getTag(item, "ultimate");
         if (tag == null) return;
 
-        if (ItemUtil.getTag(item, "ultimate").equals("category-item")) {
+        if (tag.equals("category-item")) {
             new UltimateMenu(player).open();
+
         } else if (event.getInventory().getType() != InventoryType.CRAFTING) {
             event.setCancelled(true);
         }

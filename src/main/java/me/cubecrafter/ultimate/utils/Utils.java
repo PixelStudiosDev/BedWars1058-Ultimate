@@ -90,10 +90,10 @@ public class Utils {
                 player.getInventory().addItem(getWallItem());
                 break;
             case DEMOLITION:
-                player.getInventory().addItem(new ItemBuilder("FLINT_AND_STEEL").setDisplayName(Config.DEMOLITION_ITEM_NAME.getAsString()).setUnbreakable(true).setTag("ultimate", "demolition-item").build());
+                player.getInventory().addItem(new ItemBuilder("FLINT_AND_STEEL").setDisplayName(Config.DEMOLITION_ITEM_NAME.asString()).setUnbreakable(true).setTag("ultimate", "demolition-item").build());
                 break;
             case GATHERER:
-                player.getInventory().addItem(new ItemBuilder("ENDER_CHEST").setDisplayName(Config.GATHERER_ITEM_NAME.getAsString()).setTag("ultimate", "gatherer-item").build());
+                player.getInventory().addItem(new ItemBuilder("ENDER_CHEST").setDisplayName(Config.GATHERER_ITEM_NAME.asString()).setTag("ultimate", "gatherer-item").build());
                 break;
         }
     }
@@ -110,7 +110,7 @@ public class Utils {
 
     public ItemStack getHealerPotion() {
         return new ItemBuilder("SPLASH_POTION")
-                .setDisplayName(Config.HEALER_ITEM_NAME.getAsString())
+                .setDisplayName(Config.HEALER_ITEM_NAME.asString())
                 .addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 0, 0))
                 .setTag("ultimate", "healer-item")
                 .build();
@@ -118,21 +118,21 @@ public class Utils {
 
     public ItemStack getWallItem() {
         return new ItemBuilder("BRICKS")
-                .setDisplayName(Config.BUILDER_WALL_ITEM_NAME.getAsString())
+                .setDisplayName(Config.BUILDER_WALL_ITEM_NAME.asString())
                 .setTag("ultimate", "wall-item")
                 .build();
     }
 
     public ItemStack getBridgeItem() {
         return new ItemBuilder("BRICKS")
-                .setDisplayName(Config.BUILDER_BRIDGE_ITEM_NAME.getAsString())
+                .setDisplayName(Config.BUILDER_BRIDGE_ITEM_NAME.asString())
                 .setTag("ultimate", "bridge-item")
                 .build();
     }
 
     public ItemStack getFrozoPotion() {
         return new ItemBuilder("SPLASH_POTION")
-                .setDisplayName(Config.FROZO_ITEM_NAME.getAsString())
+                .setDisplayName(Config.FROZO_ITEM_NAME.asString())
                 .addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 0, 0))
                 .setTag("ultimate", "frozo-item")
                 .build();

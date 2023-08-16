@@ -53,7 +53,7 @@ public class SwordsmanListener implements Listener, Runnable {
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.SWORDSMAN) return;
 
         resetCooldown(player);
-        player.setHealth(player.getHealth() + 2);
+        player.setHealth(Math.min(player.getHealth() + 2, player.getMaxHealth()));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class SwordsmanListener implements Listener, Runnable {
                         player.setExp(blocking.get(player) / 40f);
 
                         if (blocking.get(player) % 5 == 0) {
-                            SoundUtil.play(player, Config.SWORDSMAN_LOADING_SOUND.getAsString());
+                            SoundUtil.play(player, Config.SWORDSMAN_LOADING_SOUND.asString());
                         }
                     } else if (!player.isBlocking() && blocking.containsKey(player)) {
                         recall.put(player, player.getLocation());

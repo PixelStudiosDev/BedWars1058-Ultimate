@@ -20,6 +20,7 @@ ultimates:
   kangaroo:
     enabled: true
     displayname: "Kangaroo"
+    keep-resources-chance: 50
   swordsman:
     enabled: true
     displayname: "Swordsman"

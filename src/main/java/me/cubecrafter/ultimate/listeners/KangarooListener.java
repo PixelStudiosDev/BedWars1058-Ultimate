@@ -5,23 +5,30 @@ import com.andrei1058.bedwars.api.events.player.PlayerBedBreakEvent;
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent;
 import com.andrei1058.bedwars.api.events.player.PlayerReSpawnEvent;
 import me.cubecrafter.ultimate.UltimatePlugin;
+import me.cubecrafter.ultimate.config.Config;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
 import me.cubecrafter.ultimate.utils.Cooldown;
 import me.cubecrafter.ultimate.utils.Utils;
+import me.cubecrafter.xutils.NumberUtil;
 import me.cubecrafter.xutils.SoundUtil;
 import me.cubecrafter.xutils.Tasks;
-import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class KangarooListener implements Listener, Runnable {
     
@@ -43,9 +50,9 @@ public class KangarooListener implements Listener, Runnable {
 
         if (!event.isFlying()) return;
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.KANGAROO) return;
-        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) return;
 
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
+        if (arena.isReSpawning(player)) return;
         if (!Utils.isUltimateArena(arena)) return;
 
         event.setCancelled(true);
@@ -59,17 +66,50 @@ public class KangarooListener implements Listener, Runnable {
         SoundUtil.play(player, "ENTITY_BAT_TAKEOFF");
     }
 
-    @EventHandler
-    public void onKill(PlayerKillEvent event) {
-        if (!Utils.isUltimateArena(event.getArena())) return;
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onDeath(PlayerDeathEvent event) {
+        Player victim = event.getEntity();
 
-        Player victim = event.getVictim();
-        Player killer = event.getKiller();
+        IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(victim);
+        if (!Utils.isUltimateArena(arena)) return;
 
         if (plugin.getUltimateManager().getUltimate(victim) == Ultimate.KANGAROO) {
-            inventoryContents.put(victim, victim.getInventory().getContents());
-        }
+            if (!NumberUtil.testChance(Config.KANGAROO_KEEP_RESOURCES_CHANCE.asInt())) {
+                return;
+            }
+            PlayerInventory inventory = victim.getInventory();
+            List<Integer> slots = new ArrayList<>();
 
+            for (int i = 0; i < 36; i++) {
+                ItemStack item = inventory.getItem(i);
+                if (item == null || item.getType() == Material.AIR) continue;
+
+                slots.add(i);
+            }
+
+            event.getDrops().clear();
+
+            int slotsToKeep = slots.size() / 2;
+            for (int i = 0; i < slotsToKeep; i++) {
+                int index = ThreadLocalRandom.current().nextInt(slots.size());
+                int slot = slots.get(index);
+
+                event.getDrops().add(inventory.getItem(slot));
+                inventory.clear(slot);
+
+                slots.remove(index);
+            }
+
+            inventoryContents.put(victim, inventory.getContents());
+        }
+    }
+
+    @EventHandler
+    public void onKill(PlayerKillEvent event) {
+        IArena arena = event.getArena();
+        if (!Utils.isUltimateArena(arena)) return;
+
+        Player killer = event.getKiller();
         if (killer == null) return;
 
         if (plugin.getUltimateManager().getUltimate(killer) == Ultimate.KANGAROO) {
@@ -84,6 +124,8 @@ public class KangarooListener implements Listener, Runnable {
         Player player = event.getPlayer();
 
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.KANGAROO) return;
+
+        if (!inventoryContents.containsKey(player)) return;
 
         player.getInventory().setContents(inventoryContents.remove(player));
     }

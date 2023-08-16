@@ -63,7 +63,7 @@ public class BuilderListener implements Listener, Runnable {
                     protectBed(player, arena, event.getClickedBlock());
                 } else {
                     if (arena.isProtected(event.getClickedBlock().getRelative(event.getBlockFace()).getLocation())) {
-                        TextUtil.sendMessage(player, Config.CANT_PLACE.getAsString());
+                        TextUtil.sendMessage(player, Config.CANT_PLACE.asString());
                         return;
                     }
                     buildWall(player, event.getClickedBlock(), arena, event.getBlockFace());
@@ -79,7 +79,7 @@ public class BuilderListener implements Listener, Runnable {
                     protectBed(player, arena, event.getClickedBlock());
                 } else {
                     if (arena.isProtected(event.getClickedBlock().getRelative(event.getBlockFace()).getLocation())) {
-                        TextUtil.sendMessage(player, Config.CANT_PLACE.getAsString());
+                        TextUtil.sendMessage(player, Config.CANT_PLACE.asString());
                         return;
                     }
                     buildBridge(player, event.getClickedBlock(), arena, event.getBlockFace());
@@ -119,7 +119,7 @@ public class BuilderListener implements Listener, Runnable {
                     block = block.getRelative(clickedFace);
                 }
                 if (arena.isProtected(block.getLocation())) {
-                    TextUtil.sendMessage(player, Config.CANT_BUILD_BRIDGE.getAsString());
+                    TextUtil.sendMessage(player, Config.CANT_BUILD_BRIDGE.asString());
                     cancel();
                     return;
                 }
@@ -141,7 +141,7 @@ public class BuilderListener implements Listener, Runnable {
                         player.getInventory().clear(slot);
                     }
                 } else {
-                    TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
+                    TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.asString());
                     cancel();
                     return;
                 }
@@ -199,7 +199,7 @@ public class BuilderListener implements Listener, Runnable {
             public void run() {
                 for (Block block : row) {
                     if (arena.isProtected(block.getLocation())) {
-                        TextUtil.sendMessage(player, Config.CANT_WALL_BRIDGE.getAsString());
+                        TextUtil.sendMessage(player, Config.CANT_WALL_BRIDGE.asString());
                         cancel();
                         return;
                     }
@@ -216,7 +216,7 @@ public class BuilderListener implements Listener, Runnable {
                             player.getInventory().clear(slot);
                         }
                     } else {
-                        TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
+                        TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.asString());
                         cancel();
                         return;
                     }
@@ -247,12 +247,12 @@ public class BuilderListener implements Listener, Runnable {
         ITeam team = arena.getTeam(player);
 
         if (team.getBed().distanceSquared(block.getLocation()) > 1) {
-            TextUtil.sendMessage(player, Config.CANT_PROTECT_BED.getAsString());
+            TextUtil.sendMessage(player, Config.CANT_PROTECT_BED.asString());
             return;
         }
 
         if (player.getInventory().first(Material.WOOL) == -1) {
-            TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
+            TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.asString());
             return;
         }
 
@@ -282,7 +282,7 @@ public class BuilderListener implements Listener, Runnable {
                         player.getInventory().clear(slot);
                     }
                 } else {
-                    TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.getAsString());
+                    TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.asString());
                     return;
                 }
 
