@@ -5,13 +5,16 @@ import com.andrei1058.bedwars.api.arena.IArena;
 import com.andrei1058.bedwars.api.arena.team.ITeam;
 import me.cubecrafter.ultimate.UltimatePlugin;
 import me.cubecrafter.ultimate.ultimates.Ultimate;
+import me.cubecrafter.ultimate.utils.BlockingUtil;
 import me.cubecrafter.ultimate.utils.Cooldown;
 import me.cubecrafter.ultimate.utils.Utils;
+import me.cubecrafter.xutils.ReflectionUtil;
 import me.cubecrafter.xutils.SoundUtil;
 import me.cubecrafter.xutils.Tasks;
 import me.cubecrafter.xutils.item.ItemUtil;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
@@ -69,12 +72,17 @@ public class HealerListener implements Listener, Runnable {
                     });
 
             for (double i = 0.3; i < 2.5; i += 0.4) {
-                for (int degree = 0; degree < 360; degree += (30 / i)) {
+                for (int degree = 0; degree < 360; degree += (int) (30 / i)) {
                     double radians = Math.toRadians(degree);
                     double x = Math.cos(radians) * i;
                     double z = Math.sin(radians) * i;
 
-                    location.getWorld().playEffect(location.clone().add(x, 0.1, z), Effect.HAPPY_VILLAGER, 1);
+                    Location loc = location.clone().add(x, 0.1, z);
+                    if (ReflectionUtil.supports(12)) {
+                        location.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, loc, 1);
+                    } else {
+                        location.getWorld().playEffect(loc, Effect.HAPPY_VILLAGER, 0);
+                    }
                 }
             }
 
@@ -94,7 +102,7 @@ public class HealerListener implements Listener, Runnable {
             if (!Utils.isUltimateArena(arena)) continue;
 
             for (Player player : arena.getPlayers()) {
-                if (!player.isBlocking()) continue;
+                if (!BlockingUtil.isBlocking(player)) continue;
                 if (plugin.getUltimateManager().getUltimate(player) != Ultimate.HEALER) continue;
                 if (cooldowns.containsKey(player)) continue;
 

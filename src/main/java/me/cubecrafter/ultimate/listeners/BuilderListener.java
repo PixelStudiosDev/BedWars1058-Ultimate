@@ -132,7 +132,7 @@ public class BuilderListener implements Listener, Runnable {
                     return;
                 }
                 // Remove wool from inventory
-                int slot = player.getInventory().first(Material.WOOL);
+                int slot = getFirstWoolSlot(player);
                 if (slot != -1) {
                     ItemStack item = player.getInventory().getItem(slot);
                     if (item.getAmount() > 1) {
@@ -207,7 +207,7 @@ public class BuilderListener implements Listener, Runnable {
                         continue;
                     }
                     // Remove wool from inventory
-                    int slot = player.getInventory().first(Material.WOOL);
+                    int slot = getFirstWoolSlot(player);
                     if (slot != -1) {
                         ItemStack item = player.getInventory().getItem(slot);
                         if (item.getAmount() > 1) {
@@ -251,7 +251,7 @@ public class BuilderListener implements Listener, Runnable {
             return;
         }
 
-        if (player.getInventory().first(Material.WOOL) == -1) {
+        if (getFirstWoolSlot(player) == -1) {
             TextUtil.sendMessage(player, Config.RAN_OUT_OF_WOOL_BLOCKS.asString());
             return;
         }
@@ -273,7 +273,7 @@ public class BuilderListener implements Listener, Runnable {
 
                 if (!checked.getType().equals(Material.AIR)) continue;
 
-                int slot = player.getInventory().first(Material.WOOL);
+                int slot = getFirstWoolSlot(player);
                 if (slot != -1) {
                     ItemStack item = player.getInventory().getItem(slot);
                     if (item.getAmount() > 1) {
@@ -310,6 +310,18 @@ public class BuilderListener implements Listener, Runnable {
                 player.getInventory().addItem(Utils.getWool(team.getColor()));
             }
         }
+    }
+
+    public int getFirstWoolSlot(Player player) {
+        for (int i = 0; i < 36; i++) {
+            ItemStack item = player.getInventory().getItem(i);
+            if (item == null || item.getType() == Material.AIR) continue;
+
+            if (item.getType().toString().endsWith("WOOL")) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 }

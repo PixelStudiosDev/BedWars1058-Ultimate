@@ -13,7 +13,9 @@ import me.cubecrafter.ultimate.listeners.InventoryListener;
 import me.cubecrafter.ultimate.listeners.KangarooListener;
 import me.cubecrafter.ultimate.listeners.SwordsmanListener;
 import me.cubecrafter.ultimate.ultimates.UltimateManager;
+import me.cubecrafter.ultimate.utils.BlockingUtil;
 import me.cubecrafter.xutils.Events;
+import me.cubecrafter.xutils.ReflectionUtil;
 import me.cubecrafter.xutils.Tasks;
 import me.cubecrafter.xutils.XUtils;
 import me.cubecrafter.xutils.item.TagHandler;
@@ -58,6 +60,10 @@ public final class UltimatePlugin extends JavaPlugin {
                 new ArenaListener(this),
                 new InventoryListener(this)
         );
+
+        if (ReflectionUtil.VERSION > 9) {
+            Events.register(new BlockingUtil());
+        }
 
         XUtils.setCustomTagHandler(new TagHandler() {
 

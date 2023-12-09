@@ -29,6 +29,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -141,9 +142,13 @@ public class DemolitionListener implements Listener, Runnable {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getItem() == null || event.getItem().getType() != Material.MONSTER_EGG) return;
+        if (event.getItem() == null) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getBlockFace() != BlockFace.UP) return;
+
+        String material = event.getItem().getType().toString();
+
+        if (!material.equals("MONSTER_EGG") && !material.equals("CREEPER_SPAWN_EGG")) return;
 
         Player player = event.getPlayer();
         if (plugin.getUltimateManager().getUltimate(player) != Ultimate.DEMOLITION) return;
@@ -151,8 +156,10 @@ public class DemolitionListener implements Listener, Runnable {
         IArena arena = plugin.getBedWars().getArenaUtil().getArenaByPlayer(player);
         if (!Utils.isUltimateArena(arena)) return;
 
-        SpawnEgg egg = (SpawnEgg) event.getItem().getData();
-        if (egg.getSpawnedType() != EntityType.CREEPER) return;
+        if (event.getItem().getType().toString().equals("MONSTER_EGG")) {
+            SpawnEgg egg = (SpawnEgg) event.getItem().getData();
+            if (egg.getSpawnedType() != EntityType.CREEPER) return;
+        }
 
         event.setCancelled(true);
         event.getClickedBlock().getWorld().spawnEntity(event.getClickedBlock().getLocation().add(0, 1, 0), EntityType.CREEPER);
